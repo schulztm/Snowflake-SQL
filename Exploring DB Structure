@@ -1,0 +1,53 @@
+--https://docs.snowflake.com/en/sql-reference/info-schema
+
+--Return count of schema, excl. Information Schema
+SELECT COUNT(*) AS schema_count
+FROM snowflake_sample_data.information_schema.schemata
+WHERE schema_name <> 'INFORMATION_SCHEMA';
+
+--Return count of tables, excl. Information Schema
+SELECT COUNT(*) AS table_count
+FROM snowflake_sample_data.information_schema.tables
+WHERE table_schema <> 'INFORMATION_SCHEMA';
+
+--Return count of tables PER schema, excl. Information Schema
+SELECT 
+    table_schema,
+    COUNT(*) AS table_count
+FROM snowflake_sample_data.information_schema.tables
+WHERE table_schema <> 'INFORMATION_SCHEMA'
+GROUP BY table_schema
+ORDER BY table_count DESC;
+
+--Return count of columns PER table, excl. Information Schema
+SELECT 
+    table_schema,
+    table_name,
+    COUNT(*) AS column_count
+FROM snowflake_sample_data.information_schema.columns
+WHERE table_schema <> 'INFORMATION_SCHEMA'
+GROUP BY table_schema, table_name
+ORDER BY table_schema, table_name;
+
+--Return count of rows PER table, excl. Information Schema
+SELECT
+    table_schema,
+    table_name,
+    row_count
+FROM snowflake_sample_data.information_schema.tables
+WHERE table_schema <> 'INFORMATION_SCHEMA';
+
+
+--Return count of rows AND columns PER table, excl. Information Schema
+SELECT
+    columns.table_schema,
+    columns.table_name,
+    COUNT(columns.column_name) AS column_count,
+    tables.row_count
+FROM snowflake_sample_data.information_schema.columns
+JOIN snowflake_sample_data.information_schema.tables
+    ON columns.table_schema = tables.table_schema
+    AND columns.table_name = tables.table_name
+WHERE columns.table_schema <> 'INFORMATION_SCHEMA'
+GROUP BY columns.table_schema, columns.table_name, tables.row_count
+ORDER BY columns.table_schema, columns.table_name;
