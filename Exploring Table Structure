@@ -1,0 +1,21 @@
+--Return the count of rows and columns for THIS table in THIS schema
+SELECT
+    columns.table_schema,
+    columns.table_name,
+    COUNT(columns.column_name) AS column_count,
+    tables.row_count
+FROM snowflake_sample_data.information_schema.columns
+JOIN snowflake_sample_data.information_schema.tables
+    ON columns.table_schema = tables.table_schema
+    AND columns.table_name = tables.table_name
+WHERE columns.table_schema = 'TPCDS_SF100TCL'
+    AND columns.table_name = 'INVENTORY'
+GROUP BY columns.table_schema, columns.table_name, tables.row_count
+ORDER BY columns.table_schema, columns.table_name;
+
+--Return the type of data PER column
+SELECT
+    column_name,
+    data_type
+FROM snowflake_sample_data.information_schema.columns
+WHERE table_schema = 'TPCDS_SF100TCL' AND table_name = 'INVENTORY';
