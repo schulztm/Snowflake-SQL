@@ -1,0 +1,34 @@
+--mockaroo.public.mockaroo (source). This was created during my upload.
+
+--Create a destination table
+CREATE TABLE Target (
+    name VARCHAR(50), --the longest name is 33 characters
+    email VARCHAR(50) --the longest email is 36 characters
+);
+
+--Find the Column Names in the Source DB
+SHOW COLUMNS IN TABLE MOCKAROO.PUBLIC.MOCKAROO;
+
+--Insert Source DB into Target DB
+INSERT INTO Target (name, email)
+SELECT c2, c1
+FROM mockaroo.public.mockaroo;
+
+--Validate, at a high level, that the date are in the correct columns
+SELECT *
+FROM mockaroo.public.target
+LIMIT 10;
+
+--Validate that all the columns and rows have moved
+SELECT
+    columns.table_schema,
+    columns.table_name,
+    COUNT(columns.column_name) AS column_count,
+    tables.row_count
+FROM mockaroo.information_schema.columns
+JOIN mockaroo.information_schema.tables
+    ON columns.table_schema = tables.table_schema
+    AND columns.table_name = tables.table_name
+WHERE columns.table_schema <> 'INFORMATION_SCHEMA'
+GROUP BY columns.table_schema, columns.table_name, tables.row_count
+ORDER BY columns.table_schema, columns.table_name;
